@@ -2,10 +2,12 @@ package cz.servodata.core.service;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import cz.servodata.core.ImportStats;
 import cz.servodata.core.domain.Company;
 import cz.servodata.core.domain.Employee;
+import cz.servodata.core.repository.CompanyRepository;
+import cz.servodata.core.repository.EmployeeRepository;
 import org.apache.metamodel.csv.CsvDataContext;
-import org.apache.metamodel.data.Row;
 import org.apache.metamodel.schema.Schema;
 import org.apache.metamodel.schema.Table;
 import org.springframework.beans.BeanUtils;
@@ -20,9 +22,15 @@ import java.util.List;
 public class DefaultCsvImportService implements CsvImportService {
     @Autowired
     private ObjectMapper mapper;
+    @Autowired
+    private CompanyRepository companyRepository;
+    @Autowired
+    private EmployeeRepository employeeRepository;
+
 
     @Override
-    public void importData(String filePath) throws IOException {
+    public ImportStats importData(String filePath) throws IOException {
+        ImportStats stats = new ImportStats();
         File file = ResourceUtils.getFile(filePath);
         CsvDataContext dataContext = new CsvDataContext(file);
         Schema schema = dataContext.getDefaultSchema();
@@ -35,10 +43,26 @@ public class DefaultCsvImportService implements CsvImportService {
                 map.put(name, c[i]);
             }
             Company company = mapper.convertValue(map, Company.class);
-            System.out.println(company);
+            Company foundCompany = companyRepository.findByCompanyId(company.getCompanyId());
+            if (foundCompany != null) {
+                BeanUtils.copyProperties(company, foundCompany, "uuid", "version");
+                company = foundCompany;
+                stats.incUpdates();
+            } else {
+                stats.incInserts();
+            }
+            companyRepository.save(company);
             Employee employee = mapper.convertValue(map, Employee.class);
-            System.out.println(employee);
+            Employee foundEmployee = employeeRepository.findByEmail(employee.getEmail());
+            if (foundEmployee != null) {
+                BeanUtils.copyProperties(employee, foundEmployee, "uuid", "version");
+                employee = foundEmployee;
+                stats.incUpdates();
+            } else {
+                stats.incInserts();
+            }
+            employeeRepository.save(employee);
         });
-
+        return stats;
     }
 }

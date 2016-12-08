@@ -22,4 +22,10 @@ public class CompanyRepositoryTest {
         Company result = repository.save(new Company());
         assertThat(result.getUuid()).isNotNull();
     }
+
+    @Test
+    public void findByCompanyId() throws Exception {
+        repository.findByCompanyId("00000000");
+
+    }
 }

@@ -22,4 +22,10 @@ public class EmployeeRepositoryTest {
         Employee result = repository.save(new Employee());
         assertThat(result.getUuid()).isNotNull();
     }
+
+
+    @Test
+    public void findByEmail() throws Exception {
+        repository.findByEmail("bogus");
+    }
 }
