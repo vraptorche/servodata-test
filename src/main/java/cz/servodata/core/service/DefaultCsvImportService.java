@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.ResourceUtils;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
@@ -29,9 +30,14 @@ public class DefaultCsvImportService implements CsvImportService {
 
 
     @Override
-    public ImportStats importData(String filePath) throws IOException {
+    public ImportStats importData(String filePath) {
         ImportStats stats = new ImportStats();
-        File file = ResourceUtils.getFile(filePath);
+        File file = null;
+        try {
+            file = ResourceUtils.getFile(filePath);
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
         CsvDataContext dataContext = new CsvDataContext(file);
         Schema schema = dataContext.getDefaultSchema();
         Table table = schema.getTable(0);

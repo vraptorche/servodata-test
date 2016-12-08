@@ -7,6 +7,7 @@ import cz.servodata.core.repository.CompanyRepository;
 import cz.servodata.core.service.CsvImportService;
 import cz.servodata.core.service.DefaultCsvImportService;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
@@ -14,6 +15,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @Configuration
 @EntityScan(basePackageClasses = Persistent.class)
 @EnableJpaRepositories(basePackageClasses = CompanyRepository.class)
+@EnableConfigurationProperties(DataImporterConfigProperties.class)
 public class DataImporterConfig {
 
     @Bean

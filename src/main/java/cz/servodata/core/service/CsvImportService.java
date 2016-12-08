@@ -6,5 +6,5 @@ import java.io.IOException;
 
 
 public interface CsvImportService {
-    ImportStats importData(String filePath) throws IOException;
+    ImportStats importData(String filePath);
 }
